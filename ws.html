@@ -1,0 +1,18 @@
+<html>
+ <head>
+  <script type="application/javascript">
+if ("WebSocket" in window) {
+alert ("ws supported");
+} else {
+alert ("ws NOT supported");
+}
+</script>
+<script type="application/javascript" src='./js/jquery-1.4.3.min.js'></script>
+<script type="application/javascript" src='./js/wstest.js'></script>
+</head>
+<body onUnload="javascript:closeSocket();">
+<input type="text" id="chatIn"/>
+<input type="button" id="sendBtn" onclick="javascript:sendMsg();" value="Send"/>
+<div id="output" style="width:400px;height:600px;overflow:auto;border:1px solid #cfcfcf;">
+</body>
+</html>

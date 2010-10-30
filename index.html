@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-us" xml:lang="en-us" http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<head>
+	<!--[if IE]>
+		<script type="application/javascript" src="./js/excanvas.js"></script>
+	<![endif]-->
+	<script type="application/javascript" src='./js/jquery-1.4.3.min.js'></script>
+	<script type="application/javascript" src='./js/socket.js'></script>
+	<script type="application/javascript" src='./js/shape.js'></script>
+	<script type="application/javascript" src='./js/spriteCell.js'></script>
+	<script type="application/javascript" src='./js/sprite.js'></script>
+	<script type="application/javascript" src='./js/block.js'></script>
+	<script type="application/javascript" src='./js/level1.js'></script>
+	<script type="application/javascript" src='./js/cb.js'></script>
+	<style>
+	.mainCanvas{
+		cursor: crosshair;
+		border: 1px solid black;
+	};
+	</style>
+	<title>Cliff's Little Sandbox</title>
+	</head>
+	<body onload=main()>
+		<center>
+			<div style="font:10pt arial;width:700px;">Move with a,s,d,w. Shoot with left mouse button. Tank will fire at your cursor.
+			This is a work in progress, so please gimme time.</div>
+			<canvas id="canvas" width="800" height="600" class="mainCanvas">
+				<div id="canvasNofify">
+					Your browser doesn't support canvas... sorry.<br>
+					Try updating your browser or downloading new one.<br>
+					<a href="http://www.apple.com/safari/">Apple Safari</a><br>
+					<a href="http://www.google.com/chrome/">Google Chrome</a><br>
+					<a href="http://www.mozilla.com/firefox/">Mozilla Firefox</a><br>
+					<a href="http://www.opera.com/">Opera</a>
+				</div>
+			</canvas>
+		</center>
+	</body>
+</html>
