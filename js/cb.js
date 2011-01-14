@@ -1,4 +1,10 @@
-﻿var Direction = {up:0x01, down:0x02, left:0x04, right:0x08};
+﻿/*This is my (Cliff Newton) attempt at creating a completely browser based
+tank capture the flag game. At present the code is pretty bad. This project
+started out as just a bunch of tinkering to see what HTML Canvas can do, but
+I started having so much fun that I eventually started turning it into an actual
+game. Code refactoring is coming as soon as I decide on the complete feature set.*/
+
+var Direction = {up:0x01, down:0x02, left:0x04, right:0x08};
 var IE = document.all?true:false;
 var gTop = 0;
 var gBottom = 600;
@@ -8,20 +14,36 @@ var gShotVelocity = 300;//that's 300 pixels per second
 var gSite = new Vector2(0, 0);
 var gCanvas = document.getElementById("canvas");
 var memCanvas = document.createElement("canvas");
-memCanvas.width = gRight;
-memCanvas.height = gBottom;
-var gExplosions = new Array();
-var bgImg = new Image();   // Create new Image object
-var tankBase = new Image();   // Create new Image object
-var tankTurret = new Image();   // Create new Image object
-var bullet = new Image();   // Create new Image object
-var explosion = new Image();
 var gUI = 0;
 var gLevel = null;
 var gPlayers = new Array();
+var gExplosions = new Array();
 var gShotID = 0;
 var gKeyboardState = new keyboardState();
 var gLastFrame = new Date();
+
+var bgImg = new Image();   // Create new Image object
+var tankBaseRed = new Image();   // Create new Image object
+var tankBaseBlue = new Image();   // Create new Image object
+var tankBaseYellow = new Image();   // Create new Image object
+var tankBaseGreen = new Image();   // Create new Image object
+var tankBaseOrange = new Image();   // Create new Image object
+var tankBasePurple = new Image();   // Create new Image object
+var tankTurret = new Image();   // Create new Image object
+var bullet = new Image();   // Create new Image object
+var explosion = new Image();
+
+tankTurret.src = './images/tankTurret.png';
+tankBaseRed.src = './images/tankBaseRed.png';
+tankBaseBlue.src = './images/tankBaseBlue.png';
+tankBaseYellow.src = './images/tankBaseYellow.png';
+tankBaseGreen.src = './images/tankBaseGreen.png';
+tankBaseOrange.src = './images/tankBaseOrange.png';
+tankBasePurple.src = './images/tankBasePurple.png';
+
+bgImg.src = './images/background.jpg'; // Set source path  
+bullet.src = './images/bullet.png'; // Set source path  
+explosion.src = './images/explosion.png';
 
 keyDown = function (e){
 	var key;
@@ -40,12 +62,6 @@ keyUp = function(e){
 		gKeyboardState.keyListener(gKeyboardState.getPressedKeyMask());
 };
 
-tankBase.src = './images/tankBase.png';
-tankTurret.src = './images/tankTurret.png';
-bgImg.src = './images/background.jpg'; // Set source path  
-bullet.src = './images/bullet.png'; // Set source path  
-explosion.src = './images/explosion.png';
-
 var gLocalPlayer = new Player(new Point(10, 300));
 gKeyboardState.keyListener = transmitPlayerKeyState;
 gLocalPlayer.ship.alive = false;
@@ -60,6 +76,8 @@ gSocketHandler.onmessage = function(evt) {
 	var obj = JSON.parse(evt.data);
 	if (obj.msgType == "register"){
 		gLocalPlayer.regKey = obj.playerKey;
+	} else if (obj.msgType == "msg"){
+		$('#msgOutput').append(obj.msgData);
 	} else if (obj.msgType == "deregister"){
 		removePlayer(obj);
 	} else if (obj.msgType == "spawn"){
@@ -119,11 +137,15 @@ function update(){
 };
 function draw() {
 	gCanvas = document.getElementById("canvas");
-	var ctx = memCanvas.getContext("2d");
+	memCanvas.width = gCanvas.width;
+	memCanvas.height = gCanvas.height;
+	var ctx = memCanvas.getContext("2d");//gCanvas.getContext("2d");
+	ctx.canvas.width  = window.innerWidth;
+  	ctx.canvas.height = window.innerHeight;
 	var i = 0;
 	var j = 0;
 
-	ctx.clearRect (0, 0, 800, 600);
+	ctx.clearRect (0, 0, memCanvas.width, memCanvas.height);
 	tileBackground(ctx);
 	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
 	for (i = 0; i < gPlayers.length; i++)
@@ -139,7 +161,23 @@ function draw() {
 	for (i = 0; i < gExplosions.length; i++)
 		gExplosions[i].draw(ctx);
 	var ctx2 = gCanvas.getContext("2d");
+	ctx2.canvas.width  = window.innerWidth;
+  	ctx2.canvas.height = window.innerHeight;
 	ctx2.drawImage(memCanvas, 0, 0);
+};
+function tileBackground(ctx){
+	var col = 0;
+	var row = 0;
+	var width = $("#canvas").width();
+	var height = $("#canvas").height();
+	while (row < height){
+		col = 0;
+		while (col < width){
+			ctx.drawImage(bgImg, col, row, 128, 128);
+			col += 128;
+		}
+		row += 128;
+	}
 };
 function testShotCollision(curShot){
 
@@ -288,18 +326,6 @@ function makeExplosion (pos){
 	ex.pos.x = pos.x - 32;
 	ex.pos.y = pos.y - 32;
 	gExplosions.push(ex);
-};
-function tileBackground(ctx){
-	var row = 0;
-	var col = 0;
-	while (row < 800){
-		col = 0;
-		while (col < 600){
-			ctx.drawImage(bgImg, row, col);
-			col += 128;
-		}
-		row += 128;
-	}
 };
 function moveSite(e) {
 	if (IE) {
@@ -460,6 +486,7 @@ function destroyShot(jsonShot){
 };
 function doMouseUp(e){
 	if (gLocalPlayer.ship.alive == false){
+		$("#instructionArea").fadeOut();
 		gLocalPlayer.ship.shape.pos.x = gSite.x;
 		gLocalPlayer.ship.shape.pos.y = gSite.y;
 		gLocalPlayer.ship.alive = true;
@@ -526,7 +553,7 @@ function Boundary(start, end){
 /*Player class *********************************************************************************/
 function Player(spawnPoint, regKey){
 	this.keyState = 0;
-	this.ship = new Ship(tankBase, spawnPoint);
+	this.ship = new Ship(tankBaseRed, spawnPoint);
 	this.shots = new Array();
 	this.regKey = "";
 	if (regKey)

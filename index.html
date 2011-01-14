@@ -12,19 +12,18 @@
 	<script type="application/javascript" src='./js/block.js'></script>
 	<script type="application/javascript" src='./js/level1.js'></script>
 	<script type="application/javascript" src='./js/cb.js'></script>
-	<style>
-	.mainCanvas{
-		cursor: crosshair;
-		border: 1px solid black;
-	};
-	</style>
+	<link rel="stylesheet" HREF="./css/style.css" TYPE="text/css"/>
+
 	<title>Cliff's Little Sandbox</title>
 	</head>
 	<body onload=main()>
 		<center>
-			<div style="font:10pt arial;width:700px;">Move with a,s,d,w. Shoot with left mouse button. Tank will fire at your cursor.
-			This is a work in progress, so please gimme time.</div>
-			<canvas id="canvas" width="800" height="600" class="mainCanvas">
+			<div id="instructionArea">Spawn your tank by clicking on the map. Move with a,s,d,w. Shoot with left mouse button. 
+			The tank will fire at your cursor. If you are accessing the site the same time as someone else you should be able to try and destroy each other.
+			For the multiplayer to work please use Firefox 4, the latest version of Google Chrome or Safari. Chrome seems to offer the best experience.
+			<br>
+			This is a work in progress and currently very buggy, so please gimme time.</div>
+			<canvas id="canvas" class="mainCanvas">
 				<div id="canvasNofify">
 					Your browser doesn't support canvas... sorry.<br>
 					Try updating your browser or downloading new one.<br>
@@ -34,6 +33,7 @@
 					<a href="http://www.opera.com/">Opera</a>
 				</div>
 			</canvas>
+			<div id="msgOutput" style="overflow:auto;border:1px solid #dfdfdf;height:200px;margin-top:2px;"></div>
 		</center>
 	</body>
 </html>
