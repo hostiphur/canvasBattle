@@ -1,7 +1,7 @@
 gSocketHandler = new Object();
 $(document).ready(function(){
-	gSocket = new WebSocket("ws://127.0.0.1:8888/canvasbattleserver/battleCom");
-	//gSocket = new WebSocket("ws://thelettercliff.com:8080/canvasbattleserver/canvasbattleserver/battleCom");
+	//gSocket = new WebSocket();
+	gSocket = new WebSocket(settings.webSocketAddress);
 
 	gSocket.onopen = function(evt) {
 		sendMsg("{\"msgType\":\"register\"}");
