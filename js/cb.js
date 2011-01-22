@@ -98,6 +98,10 @@ gSocketHandler.onmessage = function(evt) {
 function main(){
 	gUI = Math.ceil(1000 / 40);
 	gLevel = new level1();
+	if (!gCanvas)
+		gCanvas = document.getElementById("canvas");
+	//Disable text select
+	gCanvas.onSelectStart = function () { return false; }
 	setInterval("update()", gUI);
 };
 function update(){
@@ -140,8 +144,8 @@ function draw() {
 	memCanvas.width = gCanvas.width;
 	memCanvas.height = gCanvas.height;
 	var ctx = memCanvas.getContext("2d");//gCanvas.getContext("2d");
-	ctx.canvas.width  = window.innerWidth;
-  	ctx.canvas.height = window.innerHeight;
+	ctx.canvas.width  = $("#canvas").width();
+  	ctx.canvas.height = $("#canvas").height();
 	var i = 0;
 	var j = 0;
 
@@ -161,8 +165,8 @@ function draw() {
 	for (i = 0; i < gExplosions.length; i++)
 		gExplosions[i].draw(ctx);
 	var ctx2 = gCanvas.getContext("2d");
-	ctx2.canvas.width  = window.innerWidth;
-  	ctx2.canvas.height = window.innerHeight;
+	ctx2.canvas.width  = $("#canvas").width();
+  	ctx2.canvas.height = $("#canvas").height();
 	ctx2.drawImage(memCanvas, 0, 0);
 };
 function tileBackground(ctx){
