@@ -32,6 +32,7 @@ var tankBasePurple = new Image();   // Create new Image object
 var tankTurret = new Image();   // Create new Image object
 var bullet = new Image();   // Create new Image object
 var explosion = new Image();
+var gDiagnostics = null;
 
 tankTurret.src = './images/tankTurret.png';
 tankBaseRed.src = './images/tankBaseRed.png';
@@ -96,15 +97,24 @@ gSocketHandler.onmessage = function(evt) {
 };
 
 function main(){
-	gUI = Math.ceil(1000 / 40);
+	gUI = Math.ceil(1000 / 100);
 	gLevel = new level1();
 	if (!gCanvas)
-		gCanvas = document.getElementById("canvas");
+		gCanvas = $("#canvas");
+	
+	if (settings.diagnosticMode == true)
+ 		gDiagnostics = new diagnostics();
+    		
 	//Disable text select
-	gCanvas.onSelectStart = function () { return false; }
+	gCanvas.onselectstart = function() {return false;} // ie
+	gCanvas.onmousedown = function() {return false;} // mozilla	
 	setInterval("update()", gUI);
 };
+
 function update(){
+	if (gDiagnostics)
+		gDiagnostics.update();
+
 	var curFrame = new Date();
 	var secondRatio = (curFrame.getTime()-gLastFrame.getTime())/1000; 
 	var i = 0;
@@ -170,6 +180,7 @@ function draw() {
 	ctx2.drawImage(memCanvas, 0, 0);
 };
 function tileBackground(ctx){
+	//return;
 	var col = 0;
 	var row = 0;
 	var width = $("#canvas").width();
