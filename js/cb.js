@@ -97,6 +97,10 @@ gSocketHandler.onmessage = function(evt) {
 };
 
 function main(){
+ 	if ($.browser.msie)
+ 		return;
+ 	$('#instructionArea').show();
+ 		
 	gUI = Math.ceil(1000 / 100);
 	gLevel = new level1();
 	if (!gCanvas)

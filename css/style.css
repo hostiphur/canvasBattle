@@ -30,6 +30,7 @@ body{
 	position:absolute;
 	align:center;
 	margin-left:-350px;
+	display:none;
 }
 #msgOutput{
 	border:none;
@@ -45,5 +46,9 @@ body{
 	display:block;
 	width:300px;
 	height:600px;
+	color:#A8B8A7;
+}
+#canvasNotify{
+	font:20px arial,sans-serif;
 	color:#A8B8A7;
 }
