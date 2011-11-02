@@ -13,14 +13,14 @@ var gRight = 800;
 var gShotVelocity = 300;//that's 300 pixels per second
 var gSite = new Vector2(0, 0);
 var gCanvas = document.getElementById("canvas");
-var memCanvas = document.createElement("canvas");
-var gUI = 0;
+var gMemCanvas = document.createElement("canvas");
 var gLevel = null;
 var gPlayers = new Array();
 var gExplosions = new Array();
 var gShotID = 0;
 var gKeyboardState = new keyboardState();
 var gLastFrame = new Date();
+var gContext = null;
 
 var bgImg = new Image();   // Create new Image object
 var tankBaseRed = new Image();   // Create new Image object
@@ -101,21 +101,34 @@ function main(){
  		return;
  	$('#instructionArea').show();
  		
-	gUI = Math.ceil(1000 / 100);
 	gLevel = new level1();
-	if (!gCanvas)
-		gCanvas = $("#canvas");
 	
 	if (settings.diagnosticMode == true)
  		gDiagnostics = new diagnostics();
+
+	/*Initialize the memory canvas by drawing the level itself. The level will never change
+	and it will not scroll, so there is no need redraw it every frame.*/
+	gCanvas = document.getElementById("canvas");
+	gMemCanvas.width = gCanvas.width;
+	gMemCanvas.height = gCanvas.height;
+	var memCtx = gMemCanvas.getContext("2d");//gCanvas.getContext("2d");
+	memCtx.canvas.width  = $("#canvas").width();
+  	memCtx.canvas.height = $("#canvas").height();
+  	tileBackground(memCtx);
+  	gLevel.drawShapes(memCtx);
+  	
+  	gContext = gCanvas.getContext("2d");
+  	gContext.canvas.width  = $("#canvas").width();
+  	gContext.canvas.height = $("#canvas").height();	
     		
 	//Disable text select
 	gCanvas.onselectstart = function() {return false;} // ie
 	gCanvas.onmousedown = function() {return false;} // mozilla	
-	setInterval("update()", gUI);
+	update();
 };
 
 function update(){
+	var start = (new Date()).getTime();
 	if (gDiagnostics)
 		gDiagnostics.update();
 
@@ -152,36 +165,32 @@ function update(){
 	transmitShipState();
 	draw();
 	gLastFrame = curFrame;
+	var end = (new Date()).getTime();
+	var refreshTime = Math.ceil(1000 / 100);//100 frames per second.
+	refreshTime -= (end - start);
+	if (refreshTime < 1)
+		refreshTime = 5;//just picked a number.
+	setTimeout("update()", refreshTime);
 };
 function draw() {
-	gCanvas = document.getElementById("canvas");
-	memCanvas.width = gCanvas.width;
-	memCanvas.height = gCanvas.height;
-	var ctx = memCanvas.getContext("2d");//gCanvas.getContext("2d");
-	ctx.canvas.width  = $("#canvas").width();
-  	ctx.canvas.height = $("#canvas").height();
 	var i = 0;
 	var j = 0;
-
-	ctx.clearRect (0, 0, memCanvas.width, memCanvas.height);
-	tileBackground(ctx);
-	ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+	
+	gContext.drawImage(gMemCanvas, 0, 0);
+	
+	gContext.fillStyle = "rgba(0, 0, 200, 0.5)";
 	for (i = 0; i < gPlayers.length; i++)
-		gPlayers[i].ship.draw(ctx);
-	ctx.fillStyle = "rgb(0, 0, 0)";
+		gPlayers[i].ship.draw(gContext);
+	gContext.fillStyle = "rgb(0, 0, 0)";
 	
 	//for (i = 0; i < gLevel.objects.length; i++)
 //		ctx.drawImage(gLevel.objects[i].img, gLevel.objects[i].pos.x, gLevel.objects[i].pos.y);
-	gLevel.drawShapes(ctx);
+	
 	for (i = 0; i < gPlayers.length; i++)
 		for (j = 0; j < gPlayers[i].shots.length; j++)
-			gPlayers[i].shots[j].draw(ctx);
+			gPlayers[i].shots[j].draw(gContext);
 	for (i = 0; i < gExplosions.length; i++)
-		gExplosions[i].draw(ctx);
-	var ctx2 = gCanvas.getContext("2d");
-	ctx2.canvas.width  = $("#canvas").width();
-  	ctx2.canvas.height = $("#canvas").height();
-	ctx2.drawImage(memCanvas, 0, 0);
+		gExplosions[i].draw(gContext);
 };
 function tileBackground(ctx){
 	//return;
@@ -214,7 +223,6 @@ function testShotCollision(curShot){
 		curShot.iVector = bounceVector;
 		curShot.bounceCount++;
 	}
-	
 	//test collisions with other bullets
 	for (i = 0; i < gPlayers.length; i++){
 		for (j = 0; j < gPlayers[i].shots.length; j++){
